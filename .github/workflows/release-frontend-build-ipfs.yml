@@ -55,6 +55,20 @@ jobs:
           bearerToken: ${{ secrets.PINATA_JWT }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: '{"hashToPin": "${{ needs.upload_build.outputs.cidv1 }}", "pinataMetadata": { "name": "Sovryn DAPP Frontend ${{ needs.upload_build.outputs.commit_short_hash }}"}}'
+  unpin_previous_builds:
+    name: Unpin Previous Builds
+    needs: upload_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: ls
+        run: "ls"
+      - name: Call Pinata API to unpin Frontend Build Content
+        id: unpin_frontend_build_content
+        uses: ./.github/workflows/actions/pinata_unpin_content
+        with:
+          bearerToken: ${{ secrets.PINATA_JWT }}
+          # url: 'https://api.pinata.cloud/data/pinList?metadata[name]=Sovryn DAPP Frontend'
+          
   create_github_release:
     name: Create Github Release
     needs: upload_build

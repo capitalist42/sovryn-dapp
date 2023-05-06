@@ -1,6 +1,11 @@
 name: Release Frontend build to IPFS
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    inputs: 
+      require_unpin_previous_builds:
+        type: boolean
+        description: "Unpin previous builds"
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -21,11 +26,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-
       - name: Install Dependencies
         run: yarn install
       - name: Build
         run: REACT_APP_IPFS_BUILD=true yarn build 
+      - name: Unpin Previous Frontend Build Content
+        uses: ./.github/workflows/pinata_unpin_content
       - name: Upload Frontend Build to IPFS via Pinata
         id: upload_frontend_build
         uses: aquiladev/ipfs-action@master
@@ -42,6 +48,24 @@ jobs:
         uses: Uniswap/convert-cidv0-cidv1@v1.0.0
         with:
           cidv0: ${{ steps.upload_frontend_build.outputs.hash }}
+  unpin_previous_builds:
+    name: Unpin Previous Builds
+    needs: upload_build
+    if: ${{ inputs.require_unpin_previous_builds }}
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@3
+      - name: Install Dependencies
+        run: yarn install
+      - name: Call Pinata API to unpin previous builds
+        uses: ./.github/workflows/pinata_unpin_content
+        with:
+          pinataKey:  ${}
+          pinataSecret:
+          pinName:
+          offset: 1 
+
   pin_build_cidv1:
     name: Pin Frontend Build CIDv1
     needs: upload_build
@@ -55,6 +79,23 @@ jobs:
           bearerToken: ${{ secrets.PINATA_JWT }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: '{"hashToPin": "${{ needs.upload_build.outputs.cidv1 }}", "pinataMetadata": { "name": "Sovryn DAPP Frontend ${{ needs.upload_build.outputs.commit_short_hash }}"}}'
+ 
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: yarn install
+      - name: Hello world action step
+        uses: ./.github/workflows/helloworld
+        id: hello
+        with:
+          who-to-greet: 'Mona the Octocat'
+      # Use the output from the `hello` step
+      - name: Get the output time
+        run: echo "The time was ${{ steps.hello.outputs.time }}"
   create_github_release:
     name: Create Github Release
     needs: upload_build

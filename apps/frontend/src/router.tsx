@@ -16,6 +16,7 @@ import { EmailUnsubscribedPage } from './app/5_pages/EmailUnsubscribedPage/Email
 import { EmailVerifiedPage } from './app/5_pages/EmailVerifiedPage/EmailVerifiedPage';
 import { ErrorPage } from './app/5_pages/ErrorPage/ErrorPage';
 import { zeroPageLoader } from './app/5_pages/ZeroPage/loader';
+import ZeroRedemptionPage from './app/5_pages/ZeroRedemptionPage/ZeroRedemptionPage';
 import { isIPFSBuild } from './utils/helpers';
 import { loadable } from './utils/loadable';
 
@@ -121,6 +122,10 @@ const routes = [
       {
         path: '/earn/staking',
         element: <StakePage />,
+      },
+      {
+        path: '/zero/redemption',
+        element: <ZeroRedemptionPage />,
       },
     ],
   },

@@ -245,6 +245,9 @@
             "withdrawCollateral": "Withdraw collateral"
         }
     },
+    "zeroRedemptionPage": {
+        "meta": { "title": "Zero redemption - Sovryn" }
+    },
     "stats": {
         "zero": {
             "title": "Zero statistics",

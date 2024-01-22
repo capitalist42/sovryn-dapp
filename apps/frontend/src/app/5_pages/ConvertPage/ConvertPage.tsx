@@ -152,7 +152,7 @@ const ConvertPage: FC = () => {
 
   const maximumAmountToConvert = useGetMaximumAvailableAmount(
     sourceToken,
-    destinationToken as SupportedTokens as SupportedTokens,
+    destinationToken as SupportedTokens,
   );
 
   const isValidAmount = useMemo(

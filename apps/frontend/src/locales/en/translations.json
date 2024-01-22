@@ -246,7 +246,12 @@
         }
     },
     "zeroRedemptionPage": {
-        "meta": { "title": "Zero redemption - Sovryn" }
+        "meta": { "title": "Zero redemption - Sovryn" },
+        "title": "Zero Protocol Redemption",
+        "subtitle": "Redeem your ZUSD/DLLR for rBTC",
+        "form": {
+            "redeemFrom": "Redeem from"
+        }
     },
     "stats": {
         "zero": {

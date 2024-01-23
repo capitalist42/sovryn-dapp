@@ -2,8 +2,8 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { t } from 'i18next';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 
-// import { useSearchParams } from 'react-router-dom';
 import { SupportedTokens } from '@sovryn/contracts';
 import {
   AmountInput,
@@ -22,15 +22,15 @@ import { useAccount } from '../../../hooks/useAccount';
 import { useWeiAmountInput } from '../../../hooks/useWeiAmountInput';
 import { translations } from '../../../locales/i18n';
 import { smartRouter } from '../ConvertPage/ConvertPage.types';
-import { smartRoute } from './ZeroRdemptionPage.types';
+import { redeemableStableCoins, smartRoute } from './ZeroRdemptionPage.types';
 
 const commonTranslations = translations.common;
 const pageTranslations = translations.zeroRedemptionPage;
 
 const ZeroRedemptionPage: FC = () => {
   const { account } = useAccount();
-  // const [searchParams, setSearchParams] = useSearchParams();
-  // const fromToken = searchParams.get('from');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const fromToken = searchParams.get('from');
 
   const [amount, setAmount] = useWeiAmountInput('');
 
@@ -38,22 +38,21 @@ const ZeroRedemptionPage: FC = () => {
     SelectOption<SupportedTokens>[]
   >([]);
 
-  // const defaultSourceToken = useMemo(() => {
-  //   if (fromToken) {
-  //     const key = redeemableStableCoins.find(
-  //       key => SupportedTokens[key] === fromToken,
-  //     );
+  const defaultSourceToken = useMemo(() => {
+    if (fromToken) {
+      const key = redeemableStableCoins.find(
+        key => SupportedTokens[key] === fromToken,
+      );
 
-  //     if (key) {
-  //       return SupportedTokens[key];
-  //     }
-  //   }
-  //   return SupportedTokens.dllr;
-  // }, [fromToken]);
+      if (key) {
+        return SupportedTokens[key];
+      }
+    }
+    return SupportedTokens.dllr;
+  }, [fromToken]);
 
-  const [sourceToken, setSourceToken] = useState<SupportedTokens>(
-    SupportedTokens.dllr,
-  );
+  const [sourceToken, setSourceToken] =
+    useState<SupportedTokens>(defaultSourceToken);
 
   const maximunAmountToRedeem = '1000'; // TODO: remove this hardcoded value
 
@@ -102,6 +101,18 @@ const ZeroRedemptionPage: FC = () => {
       .getEntries()
       .then(tokens => tokensToOptions(tokens, setTokenOptions));
   }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams();
+
+    if (sourceToken) {
+      urlParams.set('from', sourceToken);
+    } else {
+      urlParams.delete('from');
+    }
+
+    setSearchParams(new URLSearchParams(urlParams));
+  }, [sourceToken, setSearchParams]);
 
   return (
     <>
